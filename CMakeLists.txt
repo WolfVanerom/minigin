@@ -27,7 +27,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Minigin/TextObject.cpp
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
-)
+ "Minigin/Component.cpp" "Minigin/Component.h")
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
@@ -103,6 +103,11 @@ if(NOT SDL3_ttf_FOUND)
     FetchContent_MakeAvailable(SDL3_ttf)
   endif()
 endif()
+
+find_package(VLD CONFIG)
+
+target_include_directories("${TARGET_NAME}" PRIVATE ${VLD_INCLUDE_DIRS})
+target_link_libraries("${TARGET_NAME}" PRIVATE ${VLD_LIBRARIES})
 
 if (WIN32)
   # Add VLD (Visual Leak Detector) for memory leak detection on Windows
