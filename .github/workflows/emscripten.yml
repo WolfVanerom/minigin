@@ -38,6 +38,9 @@ jobs:
           emcc --version
           cmake --version
 
+      - name: Clean build directory
+        run: rm -rf build-web
+
       - name: Configure (CMake)
         run: |
           mkdir -p build-web
