@@ -13,9 +13,9 @@ namespace dae
 		std::shared_ptr<Texture2D> m_texture{};
 		std::vector<std::shared_ptr<Component>> m_components{};
 	public:
-		virtual void Update();
-		virtual void FixedUpdate();
-		virtual void Render() const;
+		void Update();
+		void FixedUpdate();
+		void Render() const;
 
 		void addComponent(std::shared_ptr<Component> component);
 		void removeComponent(std::shared_ptr<Component> component);
