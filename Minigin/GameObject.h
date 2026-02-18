@@ -26,7 +26,7 @@ namespace dae
 		void SetPosition(float x, float y);
 
 		GameObject() = default;
-		virtual ~GameObject();
+		~GameObject() = default;
 		GameObject(const GameObject& other) = delete;
 		GameObject(GameObject&& other) = delete;
 		GameObject& operator=(const GameObject& other) = delete;

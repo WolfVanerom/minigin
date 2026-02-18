@@ -5,8 +5,6 @@
 #include "Renderer.h"
 #include "Component.h"
 
-dae::GameObject::~GameObject() = default;
-
 void dae::GameObject::Update(){
 	for (const auto& component : m_components)
 	{
