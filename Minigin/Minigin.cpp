@@ -18,6 +18,7 @@
 #include "ResourceManager.h"
 
 SDL_Window* g_window{};
+float g_FPS{};
 
 void LogSDLVersion(const std::string& message, int major, int minor, int patch)
 {
@@ -78,6 +79,7 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 
 	Renderer::GetInstance().Init(g_window);
 	ResourceManager::GetInstance().Init(dataPath);
+	m_lastTime = std::chrono::high_resolution_clock::now();
 }
 
 dae::Minigin::~Minigin()
@@ -88,9 +90,9 @@ dae::Minigin::~Minigin()
 	SDL_Quit();
 }
 
-void dae::Minigin::Run(const std::function<void()>& load)
+void dae::Minigin::Run(const std::function<void(Minigin&)>& load)
 {
-	load();
+	load(*this);
 #ifndef __EMSCRIPTEN__
 	while (!m_quit)
 		RunOneFrame();
@@ -106,8 +108,13 @@ void dae::Minigin::RunOneFrame()
 	m_lastTime = currentTime;
 	m_accLag += deltaTime;
 
+	if (deltaTime > 0.0001f)
+	{
+		m_currentFPS = 1.0f / deltaTime;
+	}
+
 	m_quit = !InputManager::GetInstance().ProcessInput();
-	while (m_accLag >= m_sleepTime / m_fixedTimeStep)
+	while (m_accLag >= m_fixedTimeStep)
 	{
 		SceneManager::GetInstance().FixedUpdate();
 		m_accLag -= m_fixedTimeStep;
@@ -119,4 +126,9 @@ void dae::Minigin::RunOneFrame()
 	if (sleepTime > std::chrono::milliseconds(0)) {
 		std::this_thread::sleep_for(sleepTime);
 	}
+}
+
+float dae::Minigin::GetFPS()
+{
+	return m_currentFPS;
 }

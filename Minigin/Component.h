@@ -8,7 +8,7 @@ namespace dae
 	class Component
 	{
 	protected:
-		std::shared_ptr<GameObject> m_parent{};
+		std::weak_ptr<GameObject> m_parent{};
 	public:
 		Component(std::shared_ptr<GameObject> parent);
 		virtual void Update();

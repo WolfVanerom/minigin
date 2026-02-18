@@ -12,11 +12,13 @@ namespace dae
 		float m_accLag{0.0f};
 		int m_sleepTime{16};
 		float m_fixedTimeStep{ 0.016f };
+		float m_currentFPS{ 0.0f };
 	public:
 		explicit Minigin(const std::filesystem::path& dataPath);
 		~Minigin();
-		void Run(const std::function<void()>& load);
+		void Run(const std::function<void(Minigin&)>& load);
 		void RunOneFrame();
+		float GetFPS();
 
 		Minigin(const Minigin& other) = delete;
 		Minigin(Minigin&& other) = delete;
