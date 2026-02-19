@@ -16,7 +16,7 @@ namespace dae
 	public:
 		explicit Minigin(const std::filesystem::path& dataPath);
 		~Minigin();
-		void Run(const std::function<void(Minigin&)>& load);
+		void Run(const std::function<void()>& load);
 		void RunOneFrame();
 		float GetFPS();
 

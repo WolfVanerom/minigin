@@ -90,9 +90,9 @@ dae::Minigin::~Minigin()
 	SDL_Quit();
 }
 
-void dae::Minigin::Run(const std::function<void(Minigin&)>& load)
+void dae::Minigin::Run(const std::function<void()>& load)
 {
-	load(*this);
+	load();
 #ifndef __EMSCRIPTEN__
 	while (!m_quit)
 		RunOneFrame();
@@ -119,7 +119,7 @@ void dae::Minigin::RunOneFrame()
 		SceneManager::GetInstance().FixedUpdate();
 		m_accLag -= m_fixedTimeStep;
 	}
-	SceneManager::GetInstance().Update();
+	SceneManager::GetInstance().Update(deltaTime);
 	Renderer::GetInstance().Render();
 
 	const auto sleepTime = currentTime + std::chrono::milliseconds(m_sleepTime) - std::chrono::high_resolution_clock::now();

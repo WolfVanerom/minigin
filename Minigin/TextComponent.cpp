@@ -5,16 +5,16 @@
 #include "Font.h"
 #include "Texture2D.h"
 
-dae::TextComponent::TextComponent(std::shared_ptr<GameObject> pOwner, const std::string& text, std::shared_ptr<Font> font, const SDL_Color& color)
-	: Component(pOwner), m_needsUpdate(true), m_text(text), m_color(color), m_font(std::move(font)), m_textTexture(nullptr)
+dae::TextComponent::TextComponent(GameObject* pOwner, const std::string& text, Font* font, const SDL_Color& color)
+	: Component(pOwner), m_needsUpdate(true), m_text(text), m_color(color), m_font(font), m_textTexture(nullptr)
 {
 }
 
-void dae::TextComponent::Update()
+void dae::TextComponent::Update(float)
 {
 	if (m_needsUpdate)
 	{
-		const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), m_text.length(), m_color);
+		const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), 0, m_color);
 		if (surf == nullptr) 
 		{
 			throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());

@@ -8,10 +8,10 @@ namespace dae
 	class Component
 	{
 	protected:
-		std::weak_ptr<GameObject> m_parent{};
+		GameObject* m_parent{};
 	public:
-		Component(std::shared_ptr<GameObject> parent);
-		virtual void Update();
+		Component(GameObject* parent);
+		virtual void Update(float deltaTime);
 		virtual void FixedUpdate();
 		virtual void Render() const;
 		virtual ~Component() = default;

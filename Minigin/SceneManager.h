@@ -13,7 +13,7 @@ namespace dae
 	public:
 		Scene& CreateScene();
 
-		void Update();
+		void Update(float deltaTime);
 		void FixedUpdate();
 		void Render();
 	private:

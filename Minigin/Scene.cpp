@@ -3,7 +3,7 @@
 
 using namespace dae;
 
-void Scene::Add(std::shared_ptr<GameObject> object)
+void Scene::Add(std::unique_ptr<GameObject> object)
 {
 	assert(object != nullptr && "Cannot add a null GameObject to the scene.");
 	m_objects.emplace_back(std::move(object));
@@ -26,11 +26,11 @@ void Scene::RemoveAll()
 	m_objects.clear();
 }
 
-void Scene::Update()
+void Scene::Update(float deltaTime)
 {
 	for(auto& object : m_objects)
 	{
-		object->Update();
+		object->Update(deltaTime);
 	}
 }
 

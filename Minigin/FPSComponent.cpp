@@ -1,28 +1,30 @@
-#include "FPSComponent.h"
-#include "TextComponent.h"
-#include "Minigin.h"
-#include <string>
-#include <iomanip>
-#include <sstream>
+#include <FPSComponent.h>
+#include <TextComponent.h>
+#include "GameObject.h"
 
-dae::FPSComponent::FPSComponent(std::shared_ptr<GameObject> pOwner, std::shared_ptr<TextComponent> textComponent, Minigin* engine)
-	: Component(pOwner), m_textComponent(textComponent), m_engine(engine)
+dae::FPSComponent::FPSComponent(GameObject* pOwner)
+	: Component(pOwner), m_pTextComponent(nullptr), m_accumulatedTime(0.0f), m_frameCount(0)
 {
 }
 
-void dae::FPSComponent::Update()
+void dae::FPSComponent::Update(float deltaTime)
 {
-	if (auto textComponent = m_textComponent.lock())
+	if (!m_pTextComponent)
 	{
-		if (m_engine)
+		m_pTextComponent = dynamic_cast<TextComponent*>(m_parent->getComponent(0));
+		if (!m_pTextComponent)
 		{
-			std::stringstream ss;
-			ss << "FPS: " << std::fixed << std::setprecision(1) << m_engine->GetFPS();
-			textComponent->SetText(ss.str());
+			return;
 		}
 	}
-}
 
-void dae::FPSComponent::Render() const
-{
+	m_accumulatedTime += deltaTime;
+	m_frameCount++;
+	if (m_accumulatedTime >= 0.1f)
+	{
+		const float fps = m_frameCount / m_accumulatedTime;
+		m_pTextComponent->SetText("FPS: " + std::to_string(static_cast<int>(fps)));
+		m_accumulatedTime = 0.0f;
+		m_frameCount = 0;
+	}
 }

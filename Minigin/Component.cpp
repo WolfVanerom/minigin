@@ -1,11 +1,11 @@
 #include "Component.h"
 #include "GameObject.h"
 
-dae::Component::Component(std::shared_ptr<dae::GameObject> parent) : m_parent(std::move(parent)) {
+dae::Component::Component(GameObject* parent) : m_parent(parent) {
 
 }
 
-void dae::Component::Update() {}
+void dae::Component::Update(float) {}
 
 void dae::Component::FixedUpdate() {}
 

@@ -5,10 +5,10 @@
 #include "Renderer.h"
 #include "Component.h"
 
-void dae::GameObject::Update(){
+void dae::GameObject::Update(float deltaTime){
 	for (const auto& component : m_components)
 	{
-		component->Update();
+		component->Update(deltaTime);
 	}
 }
 
@@ -32,27 +32,30 @@ void dae::GameObject::Render() const
 	}
 }
 
-void dae::GameObject::addComponent(std::shared_ptr<dae::Component> component)
+void dae::GameObject::addComponent(std::unique_ptr<dae::Component> component)
 {
-	m_components.push_back(component);
+	m_components.push_back(std::move(component));
 }
 
-void dae::GameObject::removeComponent(std::shared_ptr<dae::Component> component)
+void dae::GameObject::removeComponent(dae::Component* component)
 {
-	m_components.erase(std::remove(m_components.begin(), m_components.end(), component), m_components.end());
+	m_components.erase(std::remove_if(m_components.begin(), m_components.end(), 
+		[component](const std::unique_ptr<Component>& ptr) { return ptr.get() == component; }), 
+		m_components.end());
 }
 
-std::shared_ptr<dae::Component> dae::GameObject::getComponent(size_t index) const
+dae::Component* dae::GameObject::getComponent(size_t index) const
 {
 	if (index < m_components.size()) {
-		return m_components[index];
+		return m_components[index].get();
 	}
 	return nullptr;
 }
 
-void dae::GameObject::hasComponentBeenAdded(std::shared_ptr<dae::Component> component) const
+void dae::GameObject::hasComponentBeenAdded(dae::Component* component) const
 {
-	if (std::find(m_components.begin(), m_components.end(), component) != m_components.end())
+	if (std::find_if(m_components.begin(), m_components.end(),
+		[component](const std::unique_ptr<Component>& ptr) { return ptr.get() == component; }) != m_components.end())
 	{
 		std::cout << "Component has been added to the GameObject." << std::endl;
 	}
