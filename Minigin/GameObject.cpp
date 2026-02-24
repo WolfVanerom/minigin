@@ -48,7 +48,8 @@ dae::Component* dae::GameObject::getComponent(const std::type_info& typeInfo) co
 {
 	for (const auto& component : m_components)
 	{
-		if (typeid(*component) == typeInfo)
+		const Component* ptr = component.get();
+		if (typeid(*ptr) == typeInfo)
 		{
 			return component.get();
 		}
