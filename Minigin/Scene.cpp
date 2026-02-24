@@ -50,3 +50,15 @@ void Scene::Render() const
 	}
 }
 
+void dae::Scene::CheckForDeletion()
+{
+	m_objects.erase(
+		std::remove_if(
+			m_objects.begin(),
+			m_objects.end(),
+			[](const auto& ptr) { return ptr->m_markedForDeletion; }
+		),
+		m_objects.end()
+	);
+}
+

@@ -11,7 +11,7 @@ void dae::FPSComponent::Update(float deltaTime)
 {
 	if (!m_pTextComponent)
 	{
-		m_pTextComponent = dynamic_cast<TextComponent*>(m_parent->getComponent(0));
+		m_pTextComponent = dynamic_cast<TextComponent*>(m_parent->getComponent(typeid(TextComponent)));
 		if (!m_pTextComponent)
 		{
 			return;

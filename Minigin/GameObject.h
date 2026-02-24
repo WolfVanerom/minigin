@@ -18,14 +18,17 @@ namespace dae
 		void Update(float deltaTime);
 		void FixedUpdate();
 		void Render() const;
+		void MarkForDeletion() { m_markedForDeletion = true; }
 
 		void addComponent(std::unique_ptr<Component> component);
 		void removeComponent(Component* component);
-		Component* getComponent(size_t index) const;
+		Component* getComponent(const std::type_info& typeInfo) const;
 		void hasComponentBeenAdded(Component* component) const;
 
 		void SetTexture(const std::string& filename);
 		void SetPosition(float x, float y);
+
+		bool m_markedForDeletion{ false };
 
 		GameObject() = default;
 		~GameObject() = default;

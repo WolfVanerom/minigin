@@ -25,6 +25,14 @@ void dae::SceneManager::Render()
 	}
 }
 
+void dae::SceneManager::CheckForDeletion()
+{
+	for (const auto& scene : m_scenes)
+	{
+		scene->CheckForDeletion();
+	}
+}
+
 dae::Scene& dae::SceneManager::CreateScene()
 {
 	m_scenes.emplace_back(std::unique_ptr<Scene>(new Scene()));

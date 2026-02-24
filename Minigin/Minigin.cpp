@@ -103,6 +103,8 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 void dae::Minigin::RunOneFrame()
 {
+	SceneManager::GetInstance().CheckForDeletion();
+
 	const auto currentTime = std::chrono::high_resolution_clock::now();
 	const float deltaTime = std::chrono::duration<float>(currentTime - m_lastTime).count();
 	m_lastTime = currentTime;

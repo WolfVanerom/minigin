@@ -44,10 +44,14 @@ void dae::GameObject::removeComponent(dae::Component* component)
 		m_components.end());
 }
 
-dae::Component* dae::GameObject::getComponent(size_t index) const
+dae::Component* dae::GameObject::getComponent(const std::type_info& typeInfo) const
 {
-	if (index < m_components.size()) {
-		return m_components[index].get();
+	for (const auto& component : m_components)
+	{
+		if (typeid(*component) == typeInfo)
+		{
+			return component.get();
+		}
 	}
 	return nullptr;
 }
