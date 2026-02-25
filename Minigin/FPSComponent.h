@@ -18,5 +18,7 @@ namespace dae
 		TextComponent* m_pTextComponent{};
 		float m_accumulatedTime{};
 		int m_frameCount{};
+		float fps{};
+		float lastFps{};
 	};
 }

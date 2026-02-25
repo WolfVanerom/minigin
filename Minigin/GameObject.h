@@ -11,9 +11,15 @@ namespace dae
 	class Texture2D;
 	class GameObject final 
 	{
-		Transform m_transform{};
-		std::shared_ptr<Texture2D> m_texture{};
+	protected:
+		Transform m_localTransform{};
+		Transform m_worldTransform{};
 		std::vector<std::unique_ptr<Component>> m_components{};
+		GameObject* m_parent{};
+		std::vector<GameObject*> m_children{};
+		bool m_positionDirty{ true };
+
+		void SetLocalPosition(const glm::vec3& pos);
 	public:
 		void Update(float deltaTime);
 		void FixedUpdate();
@@ -25,8 +31,17 @@ namespace dae
 		Component* getComponent(const std::type_info& typeInfo) const;
 		void hasComponentBeenAdded(Component* component) const;
 
-		void SetTexture(const std::string& filename);
-		void SetPosition(float x, float y);
+		void SetParent(GameObject* parent, bool keepWorldPosition);
+		GameObject* GetParent() const { return m_parent; }
+		void AddChild(GameObject* child);
+		void RemoveChild(GameObject* child);
+		bool IsChild(const GameObject* potentialChild) const;
+		
+		const glm::vec3& GetLocalPosition() const { return m_localTransform.GetPosition(); }
+		const glm::vec3& GetWorldPosition();
+		void UpdateWorldPosition();
+		void SetPositionDirty() { m_positionDirty = true; }
+		void SetPosition(float x, float y, float z = 0);
 
 		bool m_markedForDeletion{ false };
 

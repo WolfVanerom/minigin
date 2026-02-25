@@ -22,8 +22,11 @@ void dae::FPSComponent::Update(float deltaTime)
 	m_frameCount++;
 	if (m_accumulatedTime >= 0.1f)
 	{
-		const float fps = m_frameCount / m_accumulatedTime;
-		m_pTextComponent->SetText("FPS: " + std::to_string(static_cast<int>(fps)));
+		lastFps = fps;
+		fps = m_frameCount / m_accumulatedTime;
+		if (lastFps != fps) {
+			m_pTextComponent->SetText("FPS: " + std::to_string(static_cast<int>(fps)));
+		}
 		m_accumulatedTime = 0.0f;
 		m_frameCount = 0;
 	}

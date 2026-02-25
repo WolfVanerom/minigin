@@ -21,11 +21,6 @@ void dae::GameObject::FixedUpdate(){
 
 void dae::GameObject::Render() const
 {
-	if (m_texture)
-	{
-		const auto& pos = m_transform.GetPosition();
-		Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
-	}
 	for (const auto& component : m_components)
 	{
 		component->Render();
@@ -70,12 +65,85 @@ void dae::GameObject::hasComponentBeenAdded(dae::Component* component) const
 	}
 }
 
-void dae::GameObject::SetTexture(const std::string& filename)
+void dae::GameObject::SetParent(GameObject* parent, bool keepWorldPosition)
 {
-	m_texture = ResourceManager::GetInstance().LoadTexture(filename);
+	if (IsChild(parent) || parent == this || m_parent == parent) {
+		return;
+	}
+	if (parent == nullptr) {
+		SetLocalPosition(GetWorldPosition());
+	}
+	else
+	{
+		if (keepWorldPosition) {
+			SetLocalPosition(GetWorldPosition() - parent->GetWorldPosition());
+		}
+		SetPositionDirty();
+	}
+	if (m_parent) {
+		m_parent->RemoveChild(this);
+	}
+	m_parent = parent;
+	if (m_parent) {
+		m_parent->AddChild(this);
+	}
 }
 
-void dae::GameObject::SetPosition(float x, float y)
+void dae::GameObject::AddChild(GameObject* child)
 {
-	m_transform.SetPosition(x, y, 0.0f);
+	if (child == nullptr || IsChild(child) || child == this) {
+		return;
+	}
+	child->SetParent(this, true);
+	m_children.push_back(child);
+}
+
+void dae::GameObject::RemoveChild(GameObject* child)
+{
+	m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
+}
+
+void dae::GameObject::SetPosition(float x, float y, float z)
+{
+	SetLocalPosition(glm::vec3(x, y, z));
+}
+
+void dae::GameObject::SetLocalPosition(const glm::vec3& pos)
+{
+	m_localTransform.SetPosition(pos);
+	SetPositionDirty();
+}
+
+const glm::vec3& dae::GameObject::GetWorldPosition()
+{
+	if (m_positionDirty) {
+		UpdateWorldPosition();
+	}
+	return m_worldTransform.GetPosition();
+}
+
+void dae::GameObject::UpdateWorldPosition()
+{
+	if (m_positionDirty)
+	{
+		if (m_parent == nullptr) {
+			m_worldTransform.SetPosition(m_localTransform.GetPosition());
+		}
+		else {
+			m_worldTransform.SetPosition(m_parent->GetWorldPosition() + m_localTransform.GetPosition());
+		}
+	}
+	m_positionDirty = false;
+}
+
+bool dae::GameObject::IsChild(const GameObject* potentialChild) const
+{
+	for (const auto& child : m_children)
+	{
+		if (child == potentialChild || child->IsChild(potentialChild))
+		{
+			return true;
+		}
+	}
+	return false;
 }

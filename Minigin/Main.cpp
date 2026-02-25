@@ -10,6 +10,8 @@
 #include "ResourceManager.h"
 #include "TextComponent.h"
 #include "FPSComponent.h"
+#include "TextureComponent.h"
+#include "RotateAroundPivotComponent.h"
 #include "Scene.h"
 
 #include <filesystem>
@@ -20,12 +22,16 @@ static void load()
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
 	auto go = std::make_unique<dae::GameObject>();
-	go->SetTexture("background.png");
+	auto textureComponent = std::make_unique<dae::TextureComponent>(go.get());
+	textureComponent->SetTexture("background.png");
+	go->addComponent(std::move(textureComponent));
 	scene.Add(std::move(go));
 
 	go = std::make_unique<dae::GameObject>();
-	go->SetTexture("logo.png");
+	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
+	textureComponent->SetTexture("logo.png");
 	go->SetPosition(358, 180);
+	go->addComponent(std::move(textureComponent));
 	scene.Add(std::move(go));
 
 	go = std::make_unique<dae::GameObject>();
@@ -42,6 +48,26 @@ static void load()
 	tcFpscounter->SetPosition(10, 10);
 	go->addComponent(std::move(tcFpscounter));
 	go->addComponent(std::move(fpsComponent));
+	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
+	textureComponent->SetTexture("cldig1.png");
+	go->SetPosition(200, 200);
+	go->addComponent(std::move(textureComponent));
+	auto rapComponent = std::make_unique<dae::RotateAroundPivotComponent>(go.get(), glm::vec3(190, 190, 0), glm::radians(360.f));
+	go->addComponent(std::move(rapComponent));
+	dae::GameObject* parentGo = go.get();
+	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
+	textureComponent->SetTexture("cldig1.png");
+	go->SetPosition(50, 0);
+	go->SetParent(parentGo, false);
+	go->addComponent(std::move(textureComponent));
+	rapComponent = std::make_unique<dae::RotateAroundPivotComponent>(go.get(), glm::vec3(0, 0, 0), glm::radians(-360.f));
+	go->addComponent(std::move(rapComponent));
 	scene.Add(std::move(go));
 }
 
