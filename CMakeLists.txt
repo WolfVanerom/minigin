@@ -138,8 +138,14 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/soulthreads/imgui-plot.git
     GIT_TAG v0.1.0
     EXCLUDE_FROM_ALL
+    PATCH_COMMAND ${CMAKE_COMMAND} -E echo "Patching imgui_plot for ImGui compatibility..."
 )
 FetchContent_MakeAvailable(imgui_plot)
+
+# Patch imgui_plot for newer ImGui API
+file(READ "${imgui_plot_SOURCE_DIR}/src/imgui_plot.cpp" IMGUI_PLOT_CONTENT)
+string(REPLACE "ItemHoverable(frame_bb, id)" "ItemHoverable(frame_bb, id, ImGuiItemFlags_None)" IMGUI_PLOT_CONTENT "${IMGUI_PLOT_CONTENT}")
+file(WRITE "${imgui_plot_SOURCE_DIR}/src/imgui_plot.cpp" "${IMGUI_PLOT_CONTENT}")
 
 # Configure imgui_plot to use imgui
 target_include_directories(imgui_plot PUBLIC ${imgui_SOURCE_DIR})
