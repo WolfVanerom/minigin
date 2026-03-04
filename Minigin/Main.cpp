@@ -51,13 +51,19 @@ static void load()
 	scene.Add(std::move(go));
 
 	go = std::make_unique<dae::GameObject>();
+	go->SetPosition(180, 200);
+	dae::GameObject* parentGo = go.get();
+	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
 	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
 	textureComponent->SetTexture("cldig1.png");
-	go->SetPosition(200, 200);
+	go->SetPosition(10, 10);
 	go->addComponent(std::move(textureComponent));
-	auto rapComponent = std::make_unique<dae::RotateAroundPivotComponent>(go.get(), glm::vec3(190, 190, 0), glm::radians(360.f));
+	auto rapComponent = std::make_unique<dae::RotateAroundPivotComponent>(go.get(), glm::radians(360.f));
 	go->addComponent(std::move(rapComponent));
-	dae::GameObject* parentGo = go.get();
+	go->SetParent(parentGo, false);
+	parentGo = go.get();
 	scene.Add(std::move(go));
 
 	go = std::make_unique<dae::GameObject>();
@@ -66,7 +72,7 @@ static void load()
 	go->SetPosition(50, 0);
 	go->SetParent(parentGo, false);
 	go->addComponent(std::move(textureComponent));
-	rapComponent = std::make_unique<dae::RotateAroundPivotComponent>(go.get(), glm::vec3(0, 0, 0), glm::radians(-360.f));
+	rapComponent = std::make_unique<dae::RotateAroundPivotComponent>(go.get(), glm::radians(-360.f));
 	go->addComponent(std::move(rapComponent));
 	scene.Add(std::move(go));
 }

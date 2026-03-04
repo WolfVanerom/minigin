@@ -12,8 +12,7 @@ namespace dae
 	class GameObject final 
 	{
 	protected:
-		Transform m_localTransform{};
-		Transform m_worldTransform{};
+		Transform m_transform;
 		std::vector<std::unique_ptr<Component>> m_components{};
 		GameObject* m_parent{};
 		std::vector<GameObject*> m_children{};
@@ -37,16 +36,16 @@ namespace dae
 		void RemoveChild(GameObject* child);
 		bool IsChild(const GameObject* potentialChild) const;
 		
-		const glm::vec3& GetLocalPosition() const { return m_localTransform.GetPosition(); }
+		const glm::vec3& GetLocalPosition() const { return m_transform.GetLocalPosition(); }
 		const glm::vec3& GetWorldPosition();
 		void UpdateWorldPosition();
-		void SetPositionDirty() { m_positionDirty = true; }
+		void SetPositionDirty();
 		void SetPosition(float x, float y, float z = 0);
 
 		bool m_markedForDeletion{ false };
 
 		GameObject() = default;
-		~GameObject() = default;
+		~GameObject();
 		GameObject(const GameObject& other) = delete;
 		GameObject(GameObject&& other) = delete;
 		GameObject& operator=(const GameObject& other) = delete;

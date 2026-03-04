@@ -108,9 +108,26 @@ void dae::GameObject::SetPosition(float x, float y, float z)
 	SetLocalPosition(glm::vec3(x, y, z));
 }
 
+dae::GameObject::~GameObject()
+{
+	for (auto& child : m_children)
+	{
+		child->SetParent(nullptr, false);
+	}
+	m_children.clear();
+	m_components.clear();
+	if (m_parent) {
+		m_parent->RemoveChild(this);
+	}
+	m_parent = nullptr;
+	m_positionDirty = true;
+	m_transform.SetWorldPosition(glm::vec3(0, 0, 0));
+	m_transform.SetLocalPosition(glm::vec3(0, 0, 0));
+}
+
 void dae::GameObject::SetLocalPosition(const glm::vec3& pos)
 {
-	m_localTransform.SetPosition(pos);
+	m_transform.SetLocalPosition(pos);
 	SetPositionDirty();
 }
 
@@ -119,7 +136,7 @@ const glm::vec3& dae::GameObject::GetWorldPosition()
 	if (m_positionDirty) {
 		UpdateWorldPosition();
 	}
-	return m_worldTransform.GetPosition();
+	return m_transform.GetWorldPosition();
 }
 
 void dae::GameObject::UpdateWorldPosition()
@@ -127,13 +144,22 @@ void dae::GameObject::UpdateWorldPosition()
 	if (m_positionDirty)
 	{
 		if (m_parent == nullptr) {
-			m_worldTransform.SetPosition(m_localTransform.GetPosition());
+			m_transform.SetWorldPosition(m_transform.GetLocalPosition());
 		}
 		else {
-			m_worldTransform.SetPosition(m_parent->GetWorldPosition() + m_localTransform.GetPosition());
+			m_transform.SetWorldPosition(m_parent->GetWorldPosition() + m_transform.GetLocalPosition());
 		}
 	}
 	m_positionDirty = false;
+}
+
+void dae::GameObject::SetPositionDirty()
+{
+	m_positionDirty = true;
+	for (auto& child : m_children)
+	{
+		child->SetPositionDirty();
+	}
 }
 
 bool dae::GameObject::IsChild(const GameObject* potentialChild) const

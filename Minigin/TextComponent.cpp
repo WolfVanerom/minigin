@@ -34,7 +34,7 @@ void dae::TextComponent::Render() const
 {
 	if (m_textTexture != nullptr)
 	{
-		const auto& pos = m_transform.GetPosition();
+		const auto& pos = m_transform.GetWorldPosition();
 		Renderer::GetInstance().RenderTexture(*m_textTexture, pos.x, pos.y);
 	}
 }
@@ -47,7 +47,7 @@ void dae::TextComponent::SetText(const std::string& text)
 
 void dae::TextComponent::SetPosition(const float x, const float y)
 {
-	m_transform.SetPosition(x, y);
+	m_transform.SetWorldPosition(x, y);
 }
 
 void dae::TextComponent::SetColor(const SDL_Color& color)
