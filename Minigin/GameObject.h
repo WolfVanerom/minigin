@@ -12,7 +12,7 @@ namespace dae
 	class GameObject final 
 	{
 	protected:
-		Transform m_transform;
+		Transform m_transform{};
 		std::vector<std::unique_ptr<Component>> m_components{};
 		GameObject* m_parent{};
 		std::vector<GameObject*> m_children{};
