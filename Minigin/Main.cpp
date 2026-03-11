@@ -20,7 +20,9 @@
 #include <string>
 #include <TrashTheCashComponent.h>
 #include "InputManager.h"
-#include <Xinput.h>
+#ifdef _WIN32
+#include <xinput.h>
+#endif
 namespace fs = std::filesystem;
 
 static void load()

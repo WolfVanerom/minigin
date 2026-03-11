@@ -29,7 +29,7 @@ namespace dae
 		TrashTheCashComponent(TrashTheCashComponent&& other) noexcept = delete;
 		TrashTheCashComponent& operator=(const TrashTheCashComponent& other) = delete;
 		TrashTheCashComponent& operator=(TrashTheCashComponent&& other) noexcept = delete;
-		virtual void Update(float deltaTime);
+		virtual void Update(float deltaTime) override;
 		virtual void Render() const override;
 	private:
 		mutable PerformanceTestResult m_cacheTestResult;
