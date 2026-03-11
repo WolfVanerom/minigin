@@ -27,17 +27,23 @@ public:
 	int ID{};
 };
 
-void dae::TrashTheCashComponent::Update(float deltaTime)
+dae::TrashTheCashComponent::TrashTheCashComponent(GameObject* pOwner)
+	: Component(pOwner)
+{
+}
+
+void dae::TrashTheCashComponent::Update(float)
 {
 
 }
 
 void dae::TrashTheCashComponent::Render() const
 {
-
+	RenderExercise1TestWindow();
+	RenderExercise2TestWindow();
 }
 
-void dae::TrashTheCashComponent::RunCashePerformanceTest(TestType testType, int newBufferSize)
+void dae::TrashTheCashComponent::RunCashePerformanceTest(TestType testType, int newBufferSize) const
 {
 	size_t bufferSize = static_cast<size_t>(1) << newBufferSize;
 	int* buffer = new int[bufferSize];
@@ -108,7 +114,7 @@ void dae::TrashTheCashComponent::RunCashePerformanceTest(TestType testType, int 
 	delete[] buffer;
 }
 
-void RenderExercise1TestWindow()
+void dae::TrashTheCashComponent::RenderExercise1TestWindow() const
 {
 	ImGui::Begin("Exersise 1", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -117,12 +123,12 @@ void RenderExercise1TestWindow()
 
 	if (ImGui::Button("Run Cache Test", ImVec2(200, 30)))
 	{
-		CachePerformanceTest();
+		RunCashePerformanceTest(TestType::CacheTest, 24);
 	}
 
 	ImGui::Separator();
 
-	if (g_CacheTestResult.hasData || g_GameObject3DTestResult.hasData || g_GameObject3DAltTestResult.hasData)
+	if (m_cacheTestResult.hasData)
 	{
 		ImGui::Text("Test Results:");
 
@@ -132,16 +138,16 @@ void RenderExercise1TestWindow()
 		std::vector<ImU32> colors;
 		std::vector<std::string> legendLabels;
 
-		if (g_CacheTestResult.hasData && !g_CacheTestResult.steps.empty())
+		if (!m_cacheTestResult.steps.empty())
 		{
 			if (xValues.empty())
 			{
-				for (int step : g_CacheTestResult.steps)
+				for (int step : m_cacheTestResult.steps)
 				{
 					xValues.push_back(static_cast<float>(step));
 				}
 			}
-			allTimings.push_back(g_CacheTestResult.timings.data());
+			allTimings.push_back(m_cacheTestResult.timings.data());
 			colors.push_back(IM_COL32(255, 0, 0, 255));
 			legendLabels.push_back("Cache Test");
 		}
@@ -192,7 +198,7 @@ void RenderExercise1TestWindow()
 	ImGui::End();
 }
 
-void RenderExercise2TestWindow()
+void dae::TrashTheCashComponent::RenderExercise2TestWindow() const
 {
 	ImGui::Begin("Exersise 2", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -201,17 +207,18 @@ void RenderExercise2TestWindow()
 
 	if (ImGui::Button("Run GameObject3D Test", ImVec2(200, 30)))
 	{
-		GameObject3DPerformanceTest();
+		RunCashePerformanceTest(TestType::GameObject3DTest, 24);
 	}
 
 	if (ImGui::Button("Run GameObject3DAlt Test", ImVec2(200, 30)))
 	{
-		GameObject3DAltPerformanceTest();
+		RunCashePerformanceTest(TestType::GameObject3DAltTest, 24);
+		m_isAltTest = true;
 	}
 
 	ImGui::Separator();
 
-	if (g_CacheTestResult.hasData || g_GameObject3DTestResult.hasData || g_GameObject3DAltTestResult.hasData)
+	if (m_cacheTestResult.hasData)
 	{
 		ImGui::Text("Test Results:");
 
@@ -221,31 +228,31 @@ void RenderExercise2TestWindow()
 		std::vector<ImU32> colors;
 		std::vector<std::string> legendLabels;
 
-		if (g_GameObject3DTestResult.hasData && !g_GameObject3DTestResult.steps.empty())
+		if (!m_isAltTest && !m_cacheTestResult.steps.empty())
 		{
 			if (xValues.empty())
 			{
-				for (int step : g_GameObject3DTestResult.steps)
+				for (int step : m_cacheTestResult.steps)
 				{
 					xValues.push_back(static_cast<float>(step));
 				}
 			}
-			allTimings.push_back(g_GameObject3DTestResult.timings.data());
-			colors.push_back(IM_COL32(0, 255, 0, 255)); // Green
+			allTimings.push_back(m_cacheTestResult.timings.data());
+			colors.push_back(IM_COL32(0, 255, 0, 255));
 			legendLabels.push_back("GameObject3D Test");
 		}
 
-		if (g_GameObject3DAltTestResult.hasData && !g_GameObject3DAltTestResult.steps.empty())
+		if (m_isAltTest && !m_cacheTestResult.steps.empty())
 		{
 			if (xValues.empty())
 			{
-				for (int step : g_GameObject3DAltTestResult.steps)
+				for (int step : m_cacheTestResult.steps)
 				{
 					xValues.push_back(static_cast<float>(step));
 				}
 			}
-			allTimings.push_back(g_GameObject3DAltTestResult.timings.data());
-			colors.push_back(IM_COL32(0, 0, 255, 255)); // Blue
+			allTimings.push_back(m_cacheTestResult.timings.data());
+			colors.push_back(IM_COL32(0, 0, 255, 255));
 			legendLabels.push_back("GameObject3DAlt Test");
 		}
 

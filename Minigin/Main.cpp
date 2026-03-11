@@ -13,139 +13,20 @@
 #include "TextureComponent.h"
 #include "RotateAroundPivotComponent.h"
 #include "Scene.h"
-
 #include <filesystem>
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <string>
+#include <TrashTheCashComponent.h>
+#include "InputManager.h"
+#include <Xinput.h>
 namespace fs = std::filesystem;
-
-
-static void CachePerformanceTest()
-{
-	constexpr size_t bufferSize = 1 << 26;
-	int* buffer = new int[bufferSize];
-
-	for (size_t i = 0; i < bufferSize; ++i)
-	{
-		buffer[i] = static_cast<int>(i);
-	}
-
-	g_CacheTestResult.testName = "Cache Performance Test";
-	g_CacheTestResult.steps.clear();
-	g_CacheTestResult.timings.clear();
-
-	std::cout << "Cache Performance Test\n";
-	std::cout << "Step\tTime (microseconds)\n";
-
-	for (int step = 1; step <= 1024; step *= 2)
-	{
-		auto start = std::chrono::high_resolution_clock::now();
-
-		for (size_t i = 0; i < bufferSize; i += step)
-		{
-			buffer[i] *= 2;
-		}
-
-		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-
-		g_CacheTestResult.steps.push_back(step);
-		g_CacheTestResult.timings.push_back(static_cast<float>(duration));
-
-		std::cout << step << "\t" << duration << "\n";
-	}
-
-	g_CacheTestResult.hasData = true;
-	delete[] buffer;
-}
-
-static void GameObject3DPerformanceTest()
-{
-	constexpr size_t bufferSize = 1 << 24;
-	GameObject3D* buffer = new GameObject3D[bufferSize];
-
-	for (size_t i = 0; i < bufferSize; ++i)
-	{
-		buffer[i].ID = static_cast<int>(i);
-	}
-
-	g_GameObject3DTestResult.testName = "GameObject3D Performance Test";
-	g_GameObject3DTestResult.steps.clear();
-	g_GameObject3DTestResult.timings.clear();
-
-	std::cout << "GameObject3D Performance Test\n";
-	std::cout << "Step\tTime (microseconds)\n";
-
-	for (int step = 1; step <= 1024; step *= 2)
-	{
-		auto start = std::chrono::high_resolution_clock::now();
-
-		for (size_t i = 0; i < bufferSize; i += step)
-		{
-			buffer[i].ID *= 2;
-		}
-
-		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-
-		g_GameObject3DTestResult.steps.push_back(step);
-		g_GameObject3DTestResult.timings.push_back(static_cast<float>(duration));
-
-		std::cout << step << "\t" << duration << "\n";
-	}
-
-	g_GameObject3DTestResult.hasData = true;
-	delete[] buffer;
-}
-
-static void GameObject3DAltPerformanceTest()
-{
-	constexpr size_t bufferSize = 1 << 24;
-
-	Transform* transforms = new Transform[bufferSize];
-	int* IDs = new int[bufferSize];
-
-	for (size_t i = 0; i < bufferSize; ++i)
-	{
-		IDs[i] = static_cast<int>(i);
-	}
-
-	g_GameObject3DAltTestResult.testName = "GameObject3DAlt Performance Test";
-	g_GameObject3DAltTestResult.steps.clear();
-	g_GameObject3DAltTestResult.timings.clear();
-
-	std::cout << "GameObject3DAlt Performance Test\n";
-	std::cout << "Step\tTime (microseconds)\n";
-
-	for (int step = 1; step <= 1024; step *= 2)
-	{
-		auto start = std::chrono::high_resolution_clock::now();
-
-		for (size_t i = 0; i < bufferSize; i += step)
-		{
-			IDs[i] *= 2;
-		}
-
-		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-
-		g_GameObject3DAltTestResult.steps.push_back(step);
-		g_GameObject3DAltTestResult.timings.push_back(static_cast<float>(duration));
-
-		std::cout << step << "\t" << duration << "\n";
-	}
-
-	g_GameObject3DAltTestResult.hasData = true;
-	delete[] transforms;
-	delete[] IDs;
-}
-
 
 static void load()
 {
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
+
 
 	auto go = std::make_unique<dae::GameObject>();
 	auto textureComponent = std::make_unique<dae::TextureComponent>(go.get());
@@ -176,6 +57,29 @@ static void load()
 	go->addComponent(std::move(fpsComponent));
 	scene.Add(std::move(go));
 
+	// Test for Command
+	go = std::make_unique<dae::GameObject>();
+	go->SetPosition(180, 200);
+	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
+	textureComponent->SetTexture("cldig1.png");
+	dae::InputManager::GetInstance().AddCommand(SDLK_W, std::make_unique<dae::moveCommand>(go.get(), 0.0f, -10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_S, std::make_unique<dae::moveCommand>(go.get(), 0.0f, 10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_A, std::make_unique<dae::moveCommand>(go.get(), -10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_D, std::make_unique<dae::moveCommand>(go.get(), 10.0f, 0.0f));
+	go->addComponent(std::move(textureComponent));
+	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	go->SetPosition(120, 200);
+	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
+	textureComponent->SetTexture("cldig1.png");
+	dae::InputManager::GetInstance().AddCommand(XINPUT_GAMEPAD_DPAD_UP, std::make_unique<dae::moveCommand>(go.get(), 0.0f, -20.0f));
+	dae::InputManager::GetInstance().AddCommand(XINPUT_GAMEPAD_DPAD_DOWN, std::make_unique<dae::moveCommand>(go.get(), 0.0f, 20.0f));
+	dae::InputManager::GetInstance().AddCommand(XINPUT_GAMEPAD_DPAD_LEFT, std::make_unique<dae::moveCommand>(go.get(), -20.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(XINPUT_GAMEPAD_DPAD_RIGHT, std::make_unique<dae::moveCommand>(go.get(), 20.0f, 0.0f));
+	go->addComponent(std::move(textureComponent));
+	scene.Add(std::move(go));
+	
 	// Test for RotateAroundPivotComponent
 	/*go = std::make_unique<dae::GameObject>();
 	go->SetPosition(180, 200);

@@ -8,9 +8,6 @@
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
 
-void RenderExercise1TestWindow();
-void RenderExercise2TestWindow();
-
 void dae::Renderer::Init(SDL_Window* window)
 {
 	m_window = window;
@@ -37,20 +34,17 @@ void dae::Renderer::Init(SDL_Window* window)
 
 void dae::Renderer::Render() const
 {
-	ImGui_ImplSDLRenderer3_NewFrame();
-	ImGui_ImplSDL3_NewFrame();
-	ImGui::NewFrame();
-
-	RenderExercise1TestWindow();
-	RenderExercise2TestWindow();
-
-	ImGui::Render();
-
 	const auto& color = GetBackgroundColor();
 	SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderClear(m_renderer);
 
+	ImGui_ImplSDLRenderer3_NewFrame();
+	ImGui_ImplSDL3_NewFrame();
+	ImGui::NewFrame();
+
 	SceneManager::GetInstance().Render();
+
+	ImGui::Render();
 
 	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), m_renderer);
 	SDL_RenderPresent(m_renderer);

@@ -20,10 +20,10 @@ namespace dae
 		GameObject3DAltTest
 	};
 
-	class TrashTheCashComponent final : Component
+	class TrashTheCashComponent final : public Component
 	{
 	public:
-		TrashTheCashComponent() = default;
+		explicit TrashTheCashComponent(GameObject* pOwner);
 		virtual ~TrashTheCashComponent() = default;
 		TrashTheCashComponent(const TrashTheCashComponent& other) = delete;
 		TrashTheCashComponent(TrashTheCashComponent&& other) noexcept = delete;
@@ -32,7 +32,10 @@ namespace dae
 		virtual void Update(float deltaTime);
 		virtual void Render() const override;
 	private:
-		PerformanceTestResult m_cacheTestResult;
-		void RunCashePerformanceTest(TestType testType, int newBufferSize);
+		mutable PerformanceTestResult m_cacheTestResult;
+		mutable bool m_isAltTest = false;
+		void RunCashePerformanceTest(TestType testType, int newBufferSize) const;
+		void RenderExercise1TestWindow() const;
+		void RenderExercise2TestWindow() const;
 	};
 }

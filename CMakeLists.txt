@@ -1,6 +1,28 @@
 cmake_minimum_required(VERSION 3.26)
 project(Minigin)
 
+# Enable platform detection for MSVC
+if(NOT CMAKE_SYSTEM_NAME)
+  set(CMAKE_SYSTEM_NAME Windows)
+endif()
+if(NOT CMAKE_SYSTEM_PROCESSOR)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(CMAKE_SYSTEM_PROCESSOR AMD64)
+  else()
+    set(CMAKE_SYSTEM_PROCESSOR x86)
+  endif()
+endif()
+
+# Add Windows definitions early
+if(WIN32)
+  add_compile_definitions(_WINDOWS _WINDLL _USRDLL)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    add_compile_definitions(_WIN64 _AMD64_)
+  else()
+    add_compile_definitions(_X86_)
+  endif()
+endif()
+
 if(EMSCRIPTEN)
   message("Using Emscripten!")
 endif()
@@ -29,10 +51,24 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Minigin/TextComponent.cpp"
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
- "Minigin/Component.cpp" "Minigin/Component.h" "Minigin/FPSComponent.cpp" "Minigin/FPSComponent.h" "Minigin/TextureComponent.cpp" "Minigin/TextureComponent.h" "Minigin/RotateAroundPivotComponent.cpp" "Minigin/RotateAroundPivotComponent.h" "Minigin/TrashTheCashComponent.h" "Minigin/TrashTheCashComponent.cpp")
+ "Minigin/Component.cpp"
+ "Minigin/Component.h"
+ "Minigin/FPSComponent.cpp"
+ "Minigin/FPSComponent.h"
+ "Minigin/TextureComponent.cpp"
+ "Minigin/TextureComponent.h"
+ "Minigin/RotateAroundPivotComponent.cpp"
+ "Minigin/RotateAroundPivotComponent.h"
+ "Minigin/TrashTheCashComponent.h"
+ "Minigin/TrashTheCashComponent.cpp" "Minigin/XinputManager.h" "Minigin/XinputManager.cpp")
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
+
+# Link against XInput library
+if(WIN32)
+  target_link_libraries(${TARGET_NAME} PRIVATE xinput.lib)
+endif()
 
 include(FetchContent)
 # add glm
@@ -122,8 +158,7 @@ add_library(imgui STATIC
   ${imgui_SOURCE_DIR}/imgui_widgets.cpp
   ${imgui_SOURCE_DIR}/imgui_demo.cpp
   ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp
- "Minigin/TrashTheCashComponent.h" "Minigin/TrashTheCashComponent.cpp")
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp "Minigin/XinputManager.h" "Minigin/XinputManager.cpp")
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${sdl3_SOURCE_DIR}/include)
 target_link_libraries(imgui PUBLIC SDL3::SDL3)
@@ -134,11 +169,10 @@ target_compile_definitions(imgui PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
 
 include(FetchContent)
 FetchContent_Declare(
-    imgui_plot
-    GIT_REPOSITORY https://github.com/soulthreads/imgui-plot.git
-    GIT_TAG v0.1.0
-    EXCLUDE_FROM_ALL
-    PATCH_COMMAND ${CMAKE_COMMAND} -E echo "Patching imgui_plot for ImGui compatibility..."
+	imgui_plot
+	GIT_REPOSITORY https://github.com/soulthreads/imgui-plot.git
+	GIT_TAG v0.1.0
+	PATCH_COMMAND ${CMAKE_COMMAND} -E echo "Patching imgui_plot for ImGui compatibility..."
 )
 FetchContent_MakeAvailable(imgui_plot)
 
@@ -174,6 +208,7 @@ target_include_directories("${TARGET_NAME}" PUBLIC
   ${sdl3_image_SOURCE_DIR}/include
   ${sdl3_ttf_SOURCE_DIR}/include
   ${imgui_SOURCE_DIR}
+  ${imgui_plot_SOURCE_DIR}/src
   ${VLD_INCLUDE_DIR}
 )
 
@@ -182,6 +217,7 @@ target_link_libraries("${TARGET_NAME}" PUBLIC
   SDL3_ttf::SDL3_ttf
   glm::glm
   imgui
+  imgui_plot
   ${VLD_LIBRARIES}
 )
 
