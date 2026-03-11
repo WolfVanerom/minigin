@@ -15,12 +15,12 @@ namespace dae
 	class CommandWithValue : public Command {
 	private:
 		std::unique_ptr<Command> m_command;
-		float m_value;
 	public:
-		CommandWithValue(std::unique_ptr<Command> command, float value)
-			: m_command(std::move(command)), m_value(value) {}
+		CommandWithValue(std::unique_ptr<Command> command, [[maybe_unused]] float value)
+			: m_command(std::move(command)) {}
 
 		void Execute() override {
+			m_command->Execute();
 		}
 	};
 

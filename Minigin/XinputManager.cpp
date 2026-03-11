@@ -97,19 +97,27 @@ namespace dae
 		GamepadState GetGamepadState(unsigned int dwUserIndex) const
 		{
 			GamepadState state = {};
-			if (dwUserIndex >= 4) return state;
-			if (m_gamepad[dwUserIndex] == nullptr) return state;
+			if (dwUserIndex >= 4) {
+				return state;
+			}
+			if (m_gamepad[dwUserIndex] == nullptr) {
+				return state;
+			}
 
 			unsigned short buttons = 0;
 
-			if (SDL_GetGamepadButton(m_gamepad[dwUserIndex], SDL_GAMEPAD_BUTTON_DPAD_UP))
+			if (SDL_GetGamepadButton(m_gamepad[dwUserIndex], SDL_GAMEPAD_BUTTON_DPAD_UP)) {
 				buttons |= 0x0001;
-			if (SDL_GetGamepadButton(m_gamepad[dwUserIndex], SDL_GAMEPAD_BUTTON_DPAD_DOWN))
+			}
+			if (SDL_GetGamepadButton(m_gamepad[dwUserIndex], SDL_GAMEPAD_BUTTON_DPAD_DOWN)) {
 				buttons |= 0x0002;
-			if (SDL_GetGamepadButton(m_gamepad[dwUserIndex], SDL_GAMEPAD_BUTTON_DPAD_LEFT))
+			}
+			if (SDL_GetGamepadButton(m_gamepad[dwUserIndex], SDL_GAMEPAD_BUTTON_DPAD_LEFT)) {
 				buttons |= 0x0004;
-			if (SDL_GetGamepadButton(m_gamepad[dwUserIndex], SDL_GAMEPAD_BUTTON_DPAD_RIGHT))
-				buttons |= 0x0008; 
+			}
+			if (SDL_GetGamepadButton(m_gamepad[dwUserIndex], SDL_GAMEPAD_BUTTON_DPAD_RIGHT)) {
+				buttons |= 0x0008;
+			}
 
 			state.buttons = buttons;
 			state.leftTrigger = static_cast<unsigned char>(SDL_GetGamepadAxis(m_gamepad[dwUserIndex], SDL_GAMEPAD_AXIS_LEFT_TRIGGER) / 257);
