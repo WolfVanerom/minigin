@@ -75,10 +75,10 @@ static void load()
 	go->SetPosition(120, 200);
 	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
 	textureComponent->SetTexture("cldig1.png");
-	dae::InputManager::GetInstance().AddCommand(XINPUT_GAMEPAD_DPAD_UP, std::make_unique<dae::moveCommand>(go.get(), 0.0f, -20.0f));
-	dae::InputManager::GetInstance().AddCommand(XINPUT_GAMEPAD_DPAD_DOWN, std::make_unique<dae::moveCommand>(go.get(), 0.0f, 20.0f));
-	dae::InputManager::GetInstance().AddCommand(XINPUT_GAMEPAD_DPAD_LEFT, std::make_unique<dae::moveCommand>(go.get(), -20.0f, 0.0f));
-	dae::InputManager::GetInstance().AddCommand(XINPUT_GAMEPAD_DPAD_RIGHT, std::make_unique<dae::moveCommand>(go.get(), 20.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(0x0001, std::make_unique<dae::moveCommand>(go.get(), 0.0f, -20.0f));
+	dae::InputManager::GetInstance().AddCommand(0x0002, std::make_unique<dae::moveCommand>(go.get(), 0.0f, 20.0f));
+	dae::InputManager::GetInstance().AddCommand(0x0004, std::make_unique<dae::moveCommand>(go.get(), -20.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(0x0008, std::make_unique<dae::moveCommand>(go.get(), 20.0f, 0.0f));
 	go->addComponent(std::move(textureComponent));
 	scene.Add(std::move(go));
 	
