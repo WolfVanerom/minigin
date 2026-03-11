@@ -68,11 +68,11 @@ namespace dae
 
 		void Update()
 		{
+			int num_joysticks = 0;
+			const SDL_JoystickID* joysticks = SDL_GetJoysticks(&num_joysticks);
+
 			for (int i = 0; i < 4; ++i)
 			{
-				int num_joysticks = 0;
-				const int* joysticks = SDL_GetJoysticks(&num_joysticks);
-
 				if (i < num_joysticks)
 				{
 					if (m_gamepad[i] == nullptr)
