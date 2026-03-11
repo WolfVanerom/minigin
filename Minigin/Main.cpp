@@ -14,9 +14,6 @@
 #include "RotateAroundPivotComponent.h"
 #include "Scene.h"
 
-#include <imgui.h>
-#include <imgui_plot.h>
-
 #include <filesystem>
 #include <iostream>
 #include <chrono>
@@ -24,40 +21,6 @@
 #include <string>
 namespace fs = std::filesystem;
 
-struct PerformanceTestResult
-{
-	std::string testName;
-	std::vector<int> steps;
-	std::vector<float> timings;
-	bool hasData = false;
-};
-
-static PerformanceTestResult g_CacheTestResult;
-static PerformanceTestResult g_GameObject3DTestResult;
-static PerformanceTestResult g_GameObject3DAltTestResult;
-
-struct Transform
-{
-	float matrix[16] = {
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1 };
-};
-
-class GameObject3D
-{
-public:
-	Transform transform;
-	int ID{};
-};
-
-class GameObject3DAlt
-{
-public:
-	Transform* transform;
-	int ID{};
-};
 
 static void CachePerformanceTest()
 {
@@ -100,7 +63,7 @@ static void CachePerformanceTest()
 
 static void GameObject3DPerformanceTest()
 {
-	constexpr size_t bufferSize = 1 << 24; // Reduced from 1 << 26 to avoid allocation issues with larger GameObject3D
+	constexpr size_t bufferSize = 1 << 24;
 	GameObject3D* buffer = new GameObject3D[bufferSize];
 
 	for (size_t i = 0; i < bufferSize; ++i)
@@ -139,7 +102,7 @@ static void GameObject3DPerformanceTest()
 
 static void GameObject3DAltPerformanceTest()
 {
-	constexpr size_t bufferSize = 1 << 24; // Reduced from 1 << 26 to avoid allocation issues
+	constexpr size_t bufferSize = 1 << 24;
 
 	Transform* transforms = new Transform[bufferSize];
 	int* IDs = new int[bufferSize];
@@ -179,190 +142,6 @@ static void GameObject3DAltPerformanceTest()
 	delete[] IDs;
 }
 
-void RenderExercise1TestWindow()
-{
-	ImGui::Begin("Exersise 1", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-	ImGui::Text("Click button to run performance test:");
-	ImGui::Separator();
-
-	if (ImGui::Button("Run Cache Test", ImVec2(200, 30)))
-	{
-		CachePerformanceTest();
-	}
-
-	ImGui::Separator();
-
-	if (g_CacheTestResult.hasData || g_GameObject3DTestResult.hasData || g_GameObject3DAltTestResult.hasData)
-	{
-		ImGui::Text("Test Results:");
-
-		// Prepare data for plotting
-		std::vector<float> xValues;
-		std::vector<const float*> allTimings;
-		std::vector<ImU32> colors;
-		std::vector<std::string> legendLabels;
-
-		if (g_CacheTestResult.hasData && !g_CacheTestResult.steps.empty())
-		{
-			if (xValues.empty())
-			{
-				for (int step : g_CacheTestResult.steps)
-				{
-					xValues.push_back(static_cast<float>(step));
-				}
-			}
-			allTimings.push_back(g_CacheTestResult.timings.data());
-			colors.push_back(IM_COL32(255, 0, 0, 255));
-			legendLabels.push_back("Cache Test");
-		}
-
-
-
-		// Create plot configuration
-		if (!xValues.empty() && !allTimings.empty())
-		{
-			ImGui::PlotConfig conf;
-			conf.values.xs = xValues.data();
-			conf.values.ys_list = allTimings.data();
-			conf.values.ys_count = static_cast<int>(allTimings.size());
-			conf.values.count = static_cast<int>(xValues.size());
-			conf.values.colors = colors.data();
-			conf.scale.min = 0;
-
-			float maxVal = 0;
-			for (const auto* timings : allTimings)
-			{
-				for (int i = 0; i < static_cast<int>(xValues.size()); ++i)
-				{
-					if (timings[i] > maxVal)
-						maxVal = timings[i];
-				}
-			}
-			conf.scale.max = maxVal * 1.1f;
-
-			conf.tooltip.show = true;
-			conf.tooltip.format = "Step %g: %.2f μs";
-			conf.grid_x.show = true;
-			conf.grid_y.show = true;
-			conf.frame_size = ImVec2(600, 400);
-			conf.line_thickness = 2.0f;
-
-			ImGui::Plot("Performance Comparison", conf);
-
-			ImGui::Separator();
-			for (size_t i = 0; i < legendLabels.size(); ++i)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, colors[i]);
-				ImGui::Text("%s", legendLabels[i].c_str());
-				ImGui::PopStyleColor();
-			}
-		}
-	}
-
-	ImGui::End();
-}
-
-void RenderExercise2TestWindow()
-{
-	ImGui::Begin("Exersise 2", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-	ImGui::Text("Click button to run performance test:");
-	ImGui::Separator();
-
-	if (ImGui::Button("Run GameObject3D Test", ImVec2(200, 30)))
-	{
-		GameObject3DPerformanceTest();
-	}
-
-	if (ImGui::Button("Run GameObject3DAlt Test", ImVec2(200, 30)))
-	{
-		GameObject3DAltPerformanceTest();
-	}
-
-	ImGui::Separator();
-
-	if (g_CacheTestResult.hasData || g_GameObject3DTestResult.hasData || g_GameObject3DAltTestResult.hasData)
-	{
-		ImGui::Text("Test Results:");
-
-		// Prepare data for plotting
-		std::vector<float> xValues;
-		std::vector<const float*> allTimings;
-		std::vector<ImU32> colors;
-		std::vector<std::string> legendLabels;
-
-		if (g_GameObject3DTestResult.hasData && !g_GameObject3DTestResult.steps.empty())
-		{
-			if (xValues.empty())
-			{
-				for (int step : g_GameObject3DTestResult.steps)
-				{
-					xValues.push_back(static_cast<float>(step));
-				}
-			}
-			allTimings.push_back(g_GameObject3DTestResult.timings.data());
-			colors.push_back(IM_COL32(0, 255, 0, 255)); // Green
-			legendLabels.push_back("GameObject3D Test");
-		}
-
-		if (g_GameObject3DAltTestResult.hasData && !g_GameObject3DAltTestResult.steps.empty())
-		{
-			if (xValues.empty())
-			{
-				for (int step : g_GameObject3DAltTestResult.steps)
-				{
-					xValues.push_back(static_cast<float>(step));
-				}
-			}
-			allTimings.push_back(g_GameObject3DAltTestResult.timings.data());
-			colors.push_back(IM_COL32(0, 0, 255, 255)); // Blue
-			legendLabels.push_back("GameObject3DAlt Test");
-		}
-
-		// Create plot configuration
-		if (!xValues.empty() && !allTimings.empty())
-		{
-			ImGui::PlotConfig conf;
-			conf.values.xs = xValues.data();
-			conf.values.ys_list = allTimings.data();
-			conf.values.ys_count = static_cast<int>(allTimings.size());
-			conf.values.count = static_cast<int>(xValues.size());
-			conf.values.colors = colors.data();
-			conf.scale.min = 0;
-
-			float maxVal = 0;
-			for (const auto* timings : allTimings)
-			{
-				for (int i = 0; i < static_cast<int>(xValues.size()); ++i)
-				{
-					if (timings[i] > maxVal)
-						maxVal = timings[i];
-				}
-			}
-			conf.scale.max = maxVal * 1.1f;
-
-			conf.tooltip.show = true;
-			conf.tooltip.format = "Step %g: %.2f μs";
-			conf.grid_x.show = true;
-			conf.grid_y.show = true;
-			conf.frame_size = ImVec2(600, 400);
-			conf.line_thickness = 2.0f;
-
-			ImGui::Plot("Performance Comparison", conf);
-
-			ImGui::Separator();
-			for (size_t i = 0; i < legendLabels.size(); ++i)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, colors[i]);
-				ImGui::Text("%s", legendLabels[i].c_str());
-				ImGui::PopStyleColor();
-			}
-		}
-	}
-
-	ImGui::End();
-}
 
 static void load()
 {
