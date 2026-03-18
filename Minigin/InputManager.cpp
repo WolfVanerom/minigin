@@ -3,11 +3,6 @@
 #include "InputManager.h"
 #include "GameObject.h"
 
-constexpr unsigned short GAMEPAD_DPAD_UP = 0x0001;
-constexpr unsigned short GAMEPAD_DPAD_DOWN = 0x0002;
-constexpr unsigned short GAMEPAD_DPAD_LEFT = 0x0004;
-constexpr unsigned short GAMEPAD_DPAD_RIGHT = 0x0008;
-
 bool dae::InputManager::ProcessInput()
 {
 	SDL_Event e;
