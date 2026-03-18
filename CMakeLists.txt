@@ -51,16 +51,25 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Minigin/TextComponent.cpp"
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
- "Minigin/Component.cpp"
- "Minigin/Component.h"
- "Minigin/FPSComponent.cpp"
- "Minigin/FPSComponent.h"
- "Minigin/TextureComponent.cpp"
- "Minigin/TextureComponent.h"
- "Minigin/RotateAroundPivotComponent.cpp"
- "Minigin/RotateAroundPivotComponent.h"
- "Minigin/TrashTheCashComponent.h"
- "Minigin/TrashTheCashComponent.cpp" "Minigin/XinputManager.h" "Minigin/XinputManager.cpp")
+  "Minigin/Component.h"
+  "Minigin/FPSComponent.cpp"
+  "Minigin/FPSComponent.h"
+  "Minigin/TextureComponent.cpp"
+  "Minigin/TextureComponent.h"
+  "Minigin/TileMapComponent.cpp"
+  "Minigin/TileMapComponent.h"
+  "Minigin/RotateAroundPivotComponent.cpp"
+  "Minigin/RotateAroundPivotComponent.h"
+  "Minigin/TrashTheCashComponent.h"
+  "Minigin/TrashTheCashComponent.cpp" 
+  "Minigin/LevelManager.h" 
+  "Minigin/LevelManager.cpp"     
+  "Minigin/EmeraldComponent.h" 
+  "Minigin/EmeraldComponent.cpp" 
+  "Minigin/PlayerComponent.h" 
+  "Minigin/PlayerComponent.cpp" 
+  "Minigin/Observer.h" 
+  "Minigin/Observer.cpp")
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
@@ -158,12 +167,11 @@ add_library(imgui STATIC
   ${imgui_SOURCE_DIR}/imgui_widgets.cpp
   ${imgui_SOURCE_DIR}/imgui_demo.cpp
   ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp "Minigin/XinputManager.h" "Minigin/XinputManager.cpp")
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp)
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${sdl3_SOURCE_DIR}/include)
 target_link_libraries(imgui PUBLIC SDL3::SDL3)
 # enable c++20 features
-target_compile_features(imgui PUBLIC cxx_std_20)
 target_compile_features(imgui PUBLIC cxx_std_20)
 target_compile_definitions(imgui PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
 
@@ -185,16 +193,10 @@ file(WRITE "${imgui_plot_SOURCE_DIR}/src/imgui_plot.cpp" "${IMGUI_PLOT_CONTENT}"
 target_include_directories(imgui_plot PUBLIC ${imgui_SOURCE_DIR})
 target_link_libraries(imgui_plot PUBLIC imgui)
 
-target_link_libraries("${TARGET_NAME}" PRIVATE imgui_plot)
-
 find_package(VLD CONFIG)
-
-target_include_directories("${TARGET_NAME}" PRIVATE ${VLD_INCLUDE_DIRS})
-target_link_libraries("${TARGET_NAME}" PRIVATE ${VLD_LIBRARIES})
-
-if (WIN32)
-  # Add VLD (Visual Leak Detector) for memory leak detection on Windows
-  find_package(VLD CONFIG)
+if(VLD_FOUND)
+  target_include_directories("${TARGET_NAME}" PRIVATE ${VLD_INCLUDE_DIRS})
+  target_link_libraries("${TARGET_NAME}" PRIVATE ${VLD_LIBRARIES})
 endif()
 
 # Add steam if available
@@ -205,11 +207,9 @@ target_include_directories("${TARGET_NAME}" PUBLIC
   ${CMAKE_SOURCE_DIR}/Minigin/
   ${glm_SOURCE_DIR}
   ${sdl3_SOURCE_DIR}/include
-  ${sdl3_image_SOURCE_DIR}/include
   ${sdl3_ttf_SOURCE_DIR}/include
   ${imgui_SOURCE_DIR}
   ${imgui_plot_SOURCE_DIR}/src
-  ${VLD_INCLUDE_DIR}
 )
 
 target_link_libraries("${TARGET_NAME}" PUBLIC
@@ -218,7 +218,6 @@ target_link_libraries("${TARGET_NAME}" PUBLIC
   glm::glm
   imgui
   imgui_plot
-  ${VLD_LIBRARIES}
 )
 
 if(MSVC)

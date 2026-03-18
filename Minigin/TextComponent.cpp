@@ -24,6 +24,12 @@ void dae::TextComponent::Update(float)
 		{
 			throw std::runtime_error(std::string("Create text texture from surface failed: ") + SDL_GetError());
 		}
+       if (!SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_LINEAR))
+		{
+			SDL_DestroySurface(surf);
+			SDL_DestroyTexture(texture);
+			throw std::runtime_error(std::string("Set text texture scale mode failed: ") + SDL_GetError());
+		}
 		SDL_DestroySurface(surf);
 		m_textTexture = std::make_shared<Texture2D>(texture);
 		m_needsUpdate = false;
@@ -35,7 +41,8 @@ void dae::TextComponent::Render() const
 	if (m_textTexture != nullptr)
 	{
 		const auto& pos = m_transform.GetWorldPosition();
-		Renderer::GetInstance().RenderTexture(*m_textTexture, pos.x, pos.y);
+        const auto textureSize = m_textTexture->GetSize();
+		Renderer::GetInstance().RenderTexture(*m_textTexture, pos.x, pos.y, textureSize.x * m_scale, textureSize.y * m_scale);
 	}
 }
 
@@ -48,6 +55,11 @@ void dae::TextComponent::SetText(const std::string& text)
 void dae::TextComponent::SetPosition(const float x, const float y)
 {
 	m_transform.SetWorldPosition(x, y);
+}
+
+void dae::TextComponent::SetScale(const float scale)
+{
+	m_scale = scale;
 }
 
 void dae::TextComponent::SetColor(const SDL_Color& color)

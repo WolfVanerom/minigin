@@ -1,0 +1,56 @@
+#pragma once
+#include "Singleton.h"
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace dae
+{
+	enum class LevelObjectType
+	{
+		empty,
+		tunnelEnd,
+		horizontalTunnel,
+		verticalTunnel,
+		bag,
+		emerald,
+		none
+	};
+
+
+	class Scene;
+	class GameObject;
+	class LevelManager final : public Singleton<LevelManager>
+	{
+	private:
+		GameObject* m_currentNonEntetyDraw{ nullptr };
+		GameObject* m_currentBackgroundObject{ nullptr };
+		std::vector<std::vector<GameObject*>> m_EntityObjects{};
+
+		std::vector<std::string> m_currentLevel;
+
+		void CreateCurrentNonEntityDrawObject(Scene* scene);
+		void CreateCurrentBackgroundObject(Scene* scene);
+		void SpawnLevelObject(LevelObjectType type, int x, int y, Scene* scene);
+
+		LevelObjectType CharToType(char c) const;
+		char TypeToChar(LevelObjectType type) const;
+		std::string_view GetTextureForType(LevelObjectType type) const;
+		bool IsInBounds(int x, int y) const;
+	protected:
+		static constexpr int m_maxWidth{ 15 };
+		static constexpr int m_maxHeight{ 10 };
+		static constexpr float m_windowWidth{ 1024.f };
+		static constexpr float m_windowHeight{ 576.f };
+	public:
+		static constexpr float m_tileWidth = m_windowWidth / static_cast<float>(m_maxWidth);
+		static constexpr float m_tileHeight = m_windowHeight / static_cast<float>(m_maxHeight);
+
+		void LoadLevel(const std::string& levelFile, Scene* scene);
+		void RenderLevel(Scene* scene);
+		void ClearLevel();
+
+		LevelObjectType GetCell(int x, int y) const;
+		void SetCell(int x, int y, LevelObjectType type);
+	};
+}

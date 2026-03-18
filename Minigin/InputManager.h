@@ -1,6 +1,7 @@
 #pragma once
 #include "Singleton.h"
 #include "GameObject.h"
+#include "PlayerComponent.h"
 #include <memory>
 #include <unordered_map>
 
@@ -48,6 +49,19 @@ namespace dae
 		}
 	};
 
+	class damageCommand : public GameObjectCommand {
+		dae::PlayerComponent* m_playerComponent;
+	public:
+		explicit damageCommand(dae::GameObject* gameObject, dae::PlayerComponent* playerComponent) : GameObjectCommand(gameObject), m_playerComponent(playerComponent)
+		{
+		}
+		void Execute() override {
+			if (m_playerComponent != nullptr)
+			{
+				static_cast<PlayerComponent*>(m_playerComponent)->SubtractHealth(1);
+			}
+		}
+	};
 
 	class InputManager final : public Singleton<InputManager>
 	{
@@ -60,6 +74,17 @@ namespace dae
 		}
 		void RemoveCommand(int key) {
 			m_commands.erase(key);
+		}
+		void RemoveCommandsForGameObject(dae::GameObject* gameObject) {
+			for (auto it = m_commands.begin(); it != m_commands.end(); ) {
+				GameObjectCommand* gameObjectCommand = dynamic_cast<GameObjectCommand*>(it->second.get());
+				if (gameObjectCommand && gameObjectCommand->m_gameObject == gameObject) {
+					it = m_commands.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
 		}
 	};
 

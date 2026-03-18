@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include <glm/vec2.hpp>
 #include <string>
 
 namespace dae
@@ -11,6 +12,9 @@ namespace dae
 		void Render() const override;
 
 		void SetTexture(const std::string& filename);
+		void SetTiling(bool isTiled);
+		void SetTileArea(float width, float height);
+		void SetDrawSize(float width, float height);
 
 		explicit TextureComponent(GameObject* pOwner);
 		virtual ~TextureComponent() = default;
@@ -20,5 +24,8 @@ namespace dae
 		TextureComponent& operator=(TextureComponent&& other) = delete;
 	private:
 		std::shared_ptr<Texture2D> m_texture{};
+		bool m_isTiled{ false };
+		glm::vec2 m_tileArea{};
+		glm::vec2 m_drawSize{};
 	};
 }
