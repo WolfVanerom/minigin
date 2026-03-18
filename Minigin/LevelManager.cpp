@@ -70,9 +70,7 @@ void dae::LevelManager::CreateCurrentBackgroundObject(Scene* scene)
 
 void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Scene* scene)
 {
-	switch (type)
-	{
-	case LevelObjectType::emerald: 
+	if (type == LevelObjectType::emerald){
 		if (scene == nullptr || m_currentLevel.empty() || !IsInBounds(x, y))
 		{
 			return;
@@ -92,7 +90,6 @@ void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Sce
 
 		m_EntityObjects[y][x] = go.get();
 		scene->Add(std::move(go));
-		break;
 	}
 	//TODO: Implement this function to spawn the appropriate game object based on the type
 }

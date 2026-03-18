@@ -13,7 +13,7 @@ namespace dae
 		bool hasData = false;
 	};
 
-	enum TestType
+	enum class TestType
 	{
 		CacheTest,
 		GameObject3DTest,
