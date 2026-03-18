@@ -18,7 +18,7 @@
 #include <chrono>
 #include <vector>
 #include <string>
-#include <TrashTheCashComponent.h>
+#include "TrashTheCashComponent.h"
 #include "InputManager.h"
 #include "LevelManager.h"
 #include "PlayerComponent.h"
@@ -30,7 +30,11 @@ static void load() {
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 	auto levelManager = &dae::LevelManager::GetInstance();
 
+    #if __EMSCRIPTEN__
+	levelManager->LoadLevel("levelData/1.txt", &scene);
+	#else
 	levelManager->LoadLevel("Data/levelData/1.txt", &scene);
+	#endif
 
 	//player 1
 
