@@ -2,42 +2,39 @@
 #include "Renderer.h"
 #include <algorithm>
 
-namespace
+using dae::TunnelDirection;
+using dae::LevelObjectType;
+
+TunnelDirection GetDirectionFromDelta(float deltaX, float deltaY, TunnelDirection fallbackDirection)
 {
-	using dae::TunnelDirection;
-	using dae::LevelObjectType;
-
-	TunnelDirection GetDirectionFromDelta(float deltaX, float deltaY, TunnelDirection fallbackDirection)
+	const float absDeltaX = deltaX < 0.f ? -deltaX : deltaX;
+	const float absDeltaY = deltaY < 0.f ? -deltaY : deltaY;
+	if (absDeltaX == 0.f && absDeltaY == 0.f)
 	{
-		const float absDeltaX = deltaX < 0.f ? -deltaX : deltaX;
-		const float absDeltaY = deltaY < 0.f ? -deltaY : deltaY;
-		if (absDeltaX == 0.f && absDeltaY == 0.f)
-		{
-			return fallbackDirection;
-		}
-
-		if (absDeltaX >= absDeltaY)
-		{
-			return deltaX >= 0.f ? TunnelDirection::right : TunnelDirection::left;
-		}
-
-		return deltaY >= 0.f ? TunnelDirection::down : TunnelDirection::up;
+		return fallbackDirection;
 	}
 
-	dae::LevelObjectType GetTrailType(TunnelDirection direction)
+	if (absDeltaX >= absDeltaY)
 	{
-		if (direction == TunnelDirection::left || direction == TunnelDirection::right)
-		{
-			return LevelObjectType::horizontalTunnel;
-		}
-
-		if (direction == TunnelDirection::up || direction == TunnelDirection::down)
-		{
-			return LevelObjectType::verticalTunnel;
-		}
-
-		return LevelObjectType::none;
+		return deltaX >= 0.f ? TunnelDirection::right : TunnelDirection::left;
 	}
+
+	return deltaY >= 0.f ? TunnelDirection::down : TunnelDirection::up;
+}
+
+dae::LevelObjectType GetTrailType(TunnelDirection direction)
+{
+	if (direction == TunnelDirection::left || direction == TunnelDirection::right)
+	{
+		return LevelObjectType::horizontalTunnel;
+	}
+
+	if (direction == TunnelDirection::up || direction == TunnelDirection::down)
+	{
+		return LevelObjectType::verticalTunnel;
+	}
+
+	return LevelObjectType::none;
 }
 
 dae::PlayerComponent::PlayerComponent(GameObject* pOwner)
@@ -55,13 +52,40 @@ void dae::PlayerComponent::Update(float deltaTime)
 	const auto& worldPos = m_parent->GetWorldPosition();
 	const float worldX = worldPos.x;
 	const float worldY = worldPos.y;
-	const int cellX = static_cast<int>(worldPos.x / LevelManager::m_tileWidth);
-	const int cellY = static_cast<int>(worldPos.y / LevelManager::m_tileHeight);
-	const bool hasMovedToNewCell = m_hasPreviousCell && (cellX != m_previousCellX || cellY != m_previousCellY);
 	const float deltaX = worldX - m_previousWorldX;
 	const float deltaY = worldY - m_previousWorldY;
 	const auto movementDirection = GetDirectionFromDelta(deltaX, deltaY, m_previousMovementDirection);
 	const auto trailType = GetTrailType(movementDirection);
+
+	float probeX = worldX;
+	float probeY = worldY;
+	if (movementDirection == TunnelDirection::right)
+	{
+		probeX += LevelManager::m_tileWidth * 0.60f;
+		probeY += LevelManager::m_tileHeight * 0.35f;
+	}
+	else if (movementDirection == TunnelDirection::left)
+	{
+		probeY += LevelManager::m_tileHeight * 0.35f;
+	}
+	else if (movementDirection == TunnelDirection::down)
+	{
+		probeX += LevelManager::m_tileWidth * 0.30f;
+		probeY += LevelManager::m_tileHeight * 0.70f;
+	}
+	else if (movementDirection == TunnelDirection::up)
+	{
+		probeX += LevelManager::m_tileWidth * 0.30f;
+	}
+	else
+	{
+		probeX += LevelManager::m_tileWidth * 0.30f;
+		probeY += LevelManager::m_tileHeight * 0.35f;
+	}
+
+	const int cellX = static_cast<int>(probeX / LevelManager::m_tileWidth);
+	const int cellY = static_cast<int>(probeY / LevelManager::m_tileHeight);
+	const bool hasMovedToNewCell = m_hasPreviousCell && (cellX != m_previousCellX || cellY != m_previousCellY);
 
 	if (m_levelManager.GetCell(cellX, cellY) == LevelObjectType::emerald)
 	{
@@ -92,22 +116,22 @@ void dae::PlayerComponent::Update(float deltaTime)
 		if (movementDirection == TunnelDirection::left)
 		{
 			m_parent->SetPosition(worldX, cellOriginY + (LevelManager::m_tileHeight * 0.15f));
-			progress = (cellOriginX + LevelManager::m_tileWidth - worldX) / LevelManager::m_tileWidth;
+			progress = (cellOriginX + LevelManager::m_tileWidth - probeX) / LevelManager::m_tileWidth;
 		}
 		else if (movementDirection == TunnelDirection::right)
 		{
 			m_parent->SetPosition(worldX, cellOriginY + (LevelManager::m_tileHeight * 0.15f));
-			progress = (worldX - cellOriginX) / LevelManager::m_tileWidth;
+			progress = (probeX - cellOriginX) / LevelManager::m_tileWidth;
 		}
 		else if (movementDirection == TunnelDirection::up)
 		{
 			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.20f), worldY);
-			progress = (cellOriginY + LevelManager::m_tileHeight - worldY) / LevelManager::m_tileHeight;
+            progress = (cellOriginY + LevelManager::m_tileHeight - probeY) / LevelManager::m_tileHeight;
 		}
 		else if (movementDirection == TunnelDirection::down)
 		{
 			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.20f), worldY);
-			progress = (worldY - cellOriginY) / LevelManager::m_tileHeight;
+			progress = (probeY - cellOriginY) / LevelManager::m_tileHeight;
 		}
 
 		m_levelManager.SetTunnelPreview(cellX, cellY, trailType, movementDirection, progress);
@@ -125,8 +149,9 @@ void dae::PlayerComponent::Update(float deltaTime)
 		m_previousCellY = cellY;
 	}
 
-	m_previousWorldX = worldX;
-	m_previousWorldY = worldY;
+	const auto& finalWorldPos = m_parent->GetWorldPosition();
+	m_previousWorldX = finalWorldPos.x;
+	m_previousWorldY = finalWorldPos.y;
 	m_previousMovementDirection = movementDirection;
 }
 
