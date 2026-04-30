@@ -11,18 +11,20 @@
 #include "TextComponent.h"
 #include "FPSComponent.h"
 #include "TextureComponent.h"
-#include "RotateAroundPivotComponent.h"
-#include "Scene.h"
 #include <filesystem>
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <string>
-#include "TrashTheCashComponent.h"
 #include "InputManager.h"
 #include "LevelManager.h"
 #include "PlayerComponent.h"
 #include "Observer.h"
+#include "ScoreComponent.h"
+#include "LifeComponent.h"
+#include "DeathComponent.h"
+#include "SdlSoundSystem.h"
+#include "ServiceLocator.h"
 namespace fs = std::filesystem;
 
 
@@ -35,6 +37,9 @@ static void load() {
 	#else
 	levelManager->LoadLevel("Data/levelData/1.txt", &scene);
 	#endif
+
+	auto& soundSystem = dae::serviceLocator::GetSoundSystem();
+	soundSystem.registerSound(1, "Data/media/audio/0.mp3");
 
 	//player 1
 
@@ -62,19 +67,27 @@ static void load() {
 	dae::InputManager::GetInstance().AddCommand(SDLK_A, std::make_unique<dae::moveCommand>(go.get(), -10.0f, 0.0f));
 	dae::InputManager::GetInstance().AddCommand(SDLK_D, std::make_unique<dae::moveCommand>(go.get(), 10.0f, 0.0f));
 	go->addComponent(std::move(textureComponent));
-	auto playerComponent = std::make_unique<dae::PlayerComponent>(go.get());
+    auto playerComponent = std::make_unique<dae::PlayerComponent>(go.get());
 	auto* playerComponentPtr = playerComponent.get();
 	dae::InputManager::GetInstance().AddCommand(SDLK_SPACE, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr));
 	go->addComponent(std::move(playerComponent));
+
+	auto scoreComponent = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr, scoreTextComponentPtr);
+	auto* scoreComponentPtr = scoreComponent.get();
+	go->addComponent(std::move(scoreComponent));
+
+	auto lifeComponent = std::make_unique<dae::LifeComponent>(go.get(), playerComponentPtr, livesTextComponentPtr);
+	auto* lifeComponentPtr = lifeComponent.get();
+	go->addComponent(std::move(lifeComponent));
+
+	auto deathComponent = std::make_unique<dae::DeathComponent>(go.get());
+	auto* deathComponentPtr = deathComponent.get();
+	go->addComponent(std::move(deathComponent));
+
+	playerComponentPtr->AddObserver(scoreComponentPtr);
+	playerComponentPtr->AddObserver(lifeComponentPtr);
+	playerComponentPtr->AddObserver(deathComponentPtr);
 	scene.Add(std::move(go));
-
-	static std::unique_ptr<dae::remainingLivesObserver> livesObserver{};
-	livesObserver = std::make_unique<dae::remainingLivesObserver>(livesTextComponentPtr, playerComponentPtr);
-	playerComponentPtr->AddLivesObserver(livesObserver.get());
-
-	static std::unique_ptr<dae::scoreObserver> scoreObserver{};
-	scoreObserver = std::make_unique<dae::scoreObserver>(scoreTextComponentPtr, playerComponentPtr);
-	playerComponentPtr->AddScoreObserver(scoreObserver.get());
 
 	//player 2
 
@@ -102,18 +115,27 @@ static void load() {
 	dae::InputManager::GetInstance().AddCommand(SDLK_RIGHT, std::make_unique<dae::moveCommand>(go.get(), 10.0f, 0.0f));
 	go->addComponent(std::move(textureComponent));
 	playerComponent = std::make_unique<dae::PlayerComponent>(go.get());
-	playerComponentPtr = playerComponent.get();
-	dae::InputManager::GetInstance().AddCommand(SDLK_RSHIFT, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr));
+	auto* playerComponentPtr2 = playerComponent.get();
+	dae::InputManager::GetInstance().AddCommand(SDLK_RSHIFT, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr2));
 	go->addComponent(std::move(playerComponent));
+
+	auto scoreComponent2 = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr2, scoreTextComponentPtr);
+	auto* scoreComponentPtr2 = scoreComponent2.get();
+	go->addComponent(std::move(scoreComponent2));
+
+	auto lifeComponent2 = std::make_unique<dae::LifeComponent>(go.get(), playerComponentPtr2, livesTextComponentPtr);
+	auto* lifeComponentPtr2 = lifeComponent2.get();
+	go->addComponent(std::move(lifeComponent2));
+
+	auto deathComponent2 = std::make_unique<dae::DeathComponent>(go.get());
+	auto* deathComponentPtr2 = deathComponent2.get();
+	go->addComponent(std::move(deathComponent2));
+
+	playerComponentPtr2->AddObserver(scoreComponentPtr2);
+	playerComponentPtr2->AddObserver(lifeComponentPtr2);
+	playerComponentPtr2->AddObserver(deathComponentPtr2);
+
 	scene.Add(std::move(go));
-
-	static std::unique_ptr<dae::remainingLivesObserver> livesObserver1{};
-	livesObserver1 = std::make_unique<dae::remainingLivesObserver>(livesTextComponentPtr, playerComponentPtr);
-	playerComponentPtr->AddLivesObserver(livesObserver1.get());
-
-	static std::unique_ptr<dae::scoreObserver> scoreObserver1{};
-	scoreObserver1 = std::make_unique<dae::scoreObserver>(scoreTextComponentPtr, playerComponentPtr);
-	playerComponentPtr->AddScoreObserver(scoreObserver1.get());
 
 	//fps
 	go = std::make_unique<dae::GameObject>();
@@ -235,5 +257,6 @@ int main(int, char*[]) {
 
 	dae::Minigin engine(data_location);
 	engine.Run(load);
+
 	return 0;
 }
