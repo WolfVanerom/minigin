@@ -106,17 +106,15 @@ endif()
 # Add SDL3_mixer
 find_package(SDL3_mixer CONFIG QUIET)
 if(NOT SDL3_mixer_FOUND)
-  if(NOT EMSCRIPTEN)
-    FetchContent_Declare(
-      SDL3_mixer
-      URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-3.2.0/SDL3_mixer-3.2.0.tar.gz
-      DOWNLOAD_NO_PROGRESS ON
-      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
-    )
-    set(SDLMIXER_INSTALL OFF CACHE BOOL "" FORCE)
-    set(SDLMIXER_VENDORED OFF CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(SDL3_mixer)
-  endif()
+  FetchContent_Declare(
+    SDL3_mixer
+    URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-3.2.0/SDL3_mixer-3.2.0.tar.gz
+    DOWNLOAD_NO_PROGRESS ON
+    DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
+  )
+  set(SDLMIXER_INSTALL OFF CACHE BOOL "" FORCE)
+  set(SDLMIXER_VENDORED OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(SDL3_mixer)
 endif()
 
 # Dear ImGui
