@@ -28,6 +28,7 @@ namespace dae
 		std::vector<std::vector<GameObject*>> m_EntityObjects{};
 
 		std::vector<std::string> m_currentLevel;
+		Scene* m_currentScene{ nullptr };
 
 		void CreateCurrentNonEntityDrawObject(Scene* scene);
 		void CreateCurrentBackgroundObject(Scene* scene);
@@ -42,6 +43,7 @@ namespace dae
 		static constexpr int m_maxHeight{ 10 };
 		static constexpr float m_windowWidth{ 1024.f };
 		static constexpr float m_windowHeight{ 576.f };
+		int m_amountOfEmeralds{ -1 };
 	public:
 		static constexpr float m_tileWidth = m_windowWidth / static_cast<float>(m_maxWidth);
 		static constexpr float m_tileHeight = m_windowHeight / static_cast<float>(m_maxHeight);
@@ -49,6 +51,8 @@ namespace dae
 		void LoadLevel(const std::string& levelFile, Scene* scene);
 		void RenderLevel(Scene* scene);
 		void ClearLevel();
+		void CheckIfLevelCompleted();
+		void LowerEmeraldCount() { m_amountOfEmeralds--;}
 
 		LevelObjectType GetCell(int x, int y) const;
 		void SetCell(int x, int y, LevelObjectType type);

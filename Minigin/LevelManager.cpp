@@ -90,8 +90,17 @@ void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Sce
 
 		m_EntityObjects[y][x] = go.get();
 		scene->Add(std::move(go));
+		m_amountOfEmeralds++;
 	}
 	//TODO: Implement this function to spawn the appropriate game object based on the type
+}
+
+void dae::LevelManager::CheckIfLevelCompleted()
+{
+	if (m_amountOfEmeralds <= 0)
+	{
+		LoadLevel("Data/levelData/2.txt", m_currentScene);
+	}
 }
 
 dae::LevelObjectType dae::LevelManager::CharToType(char c) const
@@ -170,6 +179,8 @@ bool dae::LevelManager::IsInBounds(int x, int y) const
 
 void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 {
+	m_currentScene = scene;
+
 	std::ifstream file(levelFile);
 	if (!file.is_open())
 	{

@@ -25,6 +25,8 @@ void dae::PlayerComponent::Update(float deltaTime)
 	if (m_levelManager.GetCell(cellX, cellY) == LevelObjectType::emerald)
 	{
 		m_score += 100;
+		m_levelManager.LowerEmeraldCount();
+		m_levelManager.CheckIfLevelCompleted();
 		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
 		m_scoreChangedEvent->NotifyScoreChanged(m_parent);
 	}
