@@ -10,20 +10,26 @@ namespace dae {
 		GoldComponent* m_pGoldComponent{ nullptr };
 	public:
 		void SetGoldComponent(GoldComponent* pGoldComponent) { m_pGoldComponent = pGoldComponent; }
-		virtual void SetState() = 0;
+		virtual void OnEnter() = 0;
+		virtual void OnExit() = 0;
 		virtual void Update(float deltaTime) = 0;
 	};
 
 	class IdleState final : public GoldState
 	{
-	public:
-		void SetState() override;
+		void OnEnter() override;
+		void OnExit() override;
 		void Update(float deltaTime) override;
 	};
 
 	class FallingState final : public GoldState
 	{
-		void SetState() override;
+	protected:
+		int m_AmountFallen{ 0 };
+		int m_PrevCellY{ -1 };
+	public:
+		void OnEnter() override;
+		void OnExit() override;
 		void Update(float deltaTime) override;
 	};
 
@@ -31,9 +37,10 @@ namespace dae {
 	{
 	protected:
 		TextureComponent* m_pTextureComponent{ nullptr };
-		void SetState() override;
-		void Update(float deltaTime) override;
 	public:
+		void OnEnter() override;
+		void OnExit() override;
+		void Update(float deltaTime) override;
 		void SetTextureComponent(TextureComponent* textureComponent);
 	};
 }

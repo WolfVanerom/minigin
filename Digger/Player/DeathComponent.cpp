@@ -1,5 +1,5 @@
 #include "DeathComponent.h"
-#include <iostream>
+#include <SDL3/SDL_log.h>
 
 namespace dae {
 	DeathComponent::DeathComponent(GameObject* pOwner)
@@ -12,6 +12,6 @@ namespace dae {
 	{
 		if (event != Event::PlayerDied)
 			return;
-		std::cout << "Player has died!" << std::endl;
+		m_parent->MarkForDeletion();
 	}
 }

@@ -19,7 +19,10 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Player/LifeComponent.cpp
   Player/PlayerComponent.cpp
   Player/ScoreComponent.cpp
- "SdlSoundSystem.h" "SdlSoundSystem.cpp" "Level/GoldComponent.h" "Level/GoldState.h")
+  SdlSoundSystem.h 
+  SdlSoundSystem.cpp 
+  Level/GoldComponent.h
+  Level/GoldState.h)
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 

@@ -16,7 +16,8 @@ namespace dae{
 		m_pBrokenState->SetGoldComponent(this);
 		m_pBrokenState->SetTextureComponent(static_cast<TextureComponent*>(m_parent->getComponent(typeid(TextureComponent))));
 		m_pCurrentState = m_pIdleState;
-		m_pIdleState->SetState();
+		m_originalCellX = static_cast<int>(std::round(m_parent->GetWorldPosition().x / LevelManager::m_tileWidth));
+		m_originalCellY = static_cast<int>(std::round(m_parent->GetWorldPosition().y / LevelManager::m_tileHeight));
 	}
 
 	void GoldComponent::Update(float deltaTime)

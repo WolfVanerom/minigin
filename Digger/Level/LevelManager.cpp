@@ -9,6 +9,7 @@
 #include "TextureComponent.h"
 #include "EmeraldComponent.h"
 #include "GoldComponent.h"
+#include <SDL3/SDL_log.h>
 
 void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 {
@@ -42,7 +43,7 @@ void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 
 	go->addComponent(std::move(tileMapComponent));
 	m_currentNonEntetyDraw = go.get();
-	scene->Add(std::move(go));
+	scene->InsertAt(1, std::move(go));
 }
 
 void dae::LevelManager::CreateCurrentBackgroundObject(Scene* scene)
@@ -66,7 +67,7 @@ void dae::LevelManager::CreateCurrentBackgroundObject(Scene* scene)
 	
 	go->addComponent(std::move(textureComponent));
 	m_currentBackgroundObject = go.get();
-	scene->Add(std::move(go));
+	scene->ReplaceFront(std::move(go));
 }
 
 void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Scene* scene)
@@ -119,6 +120,7 @@ void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Sce
 
 void dae::LevelManager::CheckIfLevelCompleted()
 {
+	SDL_Log("Checking if level completed. Remaining emeralds: %d", m_amountOfEmeralds);
 	if (m_amountOfEmeralds <= 0)
 	{
 		m_currentLevelIndex++;
@@ -208,6 +210,8 @@ void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 {
 	m_currentScene = scene;
 
+	m_amountOfEmeralds = -1;
+
 	std::ifstream file(levelFile);
 	if (!file.is_open())
 	{
@@ -247,7 +251,6 @@ void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 	m_EntityObjects.assign(m_maxHeight, std::vector<GameObject*>(m_maxWidth, nullptr));
 	CreateCurrentBackgroundObject(scene);
 	CreateCurrentNonEntityDrawObject(scene);
-	bool onebag = false;
 	for (int y = 0; y < m_maxHeight; ++y)
 	{
 		for (int x = 0; x < m_maxWidth; ++x)

@@ -29,12 +29,14 @@ namespace dae
 		PlayerComponent(PlayerComponent&& other) = delete;
 		PlayerComponent& operator=(const PlayerComponent& other) = delete;
 		PlayerComponent& operator=(PlayerComponent&& other) = delete;
-		void Update(float deltaTime) override;
 
+		void Update(float deltaTime) override;
 		void SubtractHealth(int amount);
 		int GetHealth() const { return m_health; }
 		int GetScore() const { return m_score; }
+
 		TunnelDirection GetLockedMovementDirection() const { return m_lockedMovementDirection; }
+
 		bool CanMoveInDirection(TunnelDirection direction) const
 		{
 			return m_lockedMovementDirection == TunnelDirection::none || m_lockedMovementDirection == direction;

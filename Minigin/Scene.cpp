@@ -9,6 +9,16 @@ void Scene::Add(std::unique_ptr<GameObject> object)
 	m_objects.emplace_back(std::move(object));
 }
 
+void dae::Scene::InsertAt(size_t index, std::unique_ptr<GameObject> object)
+{
+	assert(object != nullptr && "Cannot insert a null GameObject into the scene.");
+	if (index > m_objects.size())
+	{
+		index = m_objects.size();
+	}
+	m_objects.insert(m_objects.begin() + static_cast<int>(index), std::move(object));
+}
+
 void Scene::Remove(const GameObject& object)
 {
 	m_objects.erase(

@@ -10,6 +10,7 @@ namespace dae
 	{
 	public:
 		void Add(std::unique_ptr<GameObject> object);
+		void InsertAt(size_t index, std::unique_ptr<GameObject> object);
 		void Remove(const GameObject& object);
 		void RemoveAll();
 

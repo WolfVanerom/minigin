@@ -103,7 +103,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 	}
 	else if(m_levelManager.GetCell(cellX, cellY) == LevelObjectType::bag)
 	{
-		SDL_Log("Gold collected at cell (%d, %d)", cellX, cellY);
+		//SDL_Log("Gold collected at cell (%d, %d)", cellX, cellY);
 		m_score += 250;
 		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
 
@@ -159,7 +159,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 
 		m_levelManager.SetTunnelPreview(cellX, cellY, trailType, movementDirection, m_tunnelProgress);
 
-		SDL_Log("Tunnel progress: %f", m_tunnelProgress);
+		//SDL_Log("Tunnel progress: %f", m_tunnelProgress);
 
 		if (m_tunnelProgress >= 0.8f)
 		{
