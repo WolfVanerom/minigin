@@ -67,7 +67,7 @@ void dae::LevelManager::CreateCurrentBackgroundObject(Scene* scene)
 	
 	go->addComponent(std::move(textureComponent));
 	m_currentBackgroundObject = go.get();
-	scene->ReplaceFront(std::move(go));
+	scene->InsertAt(0, std::move(go));
 }
 
 void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Scene* scene)
